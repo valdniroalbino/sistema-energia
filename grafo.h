@@ -26,7 +26,5 @@ void grafo_imprimir(GRF g);
 void grafo_destruir(GRF g);
 void grafo_bfs(GRF g, int origem);
 
-
-
 #endif
 
