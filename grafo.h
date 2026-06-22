@@ -1,30 +1,24 @@
 #ifndef GRAFO_H
 #define GRAFO_H
 
-typedef struct Aresta{
-    int destino;
-    int peso;
-    struct Aresta *prox;
+typedef struct vertice{
+	char nome;
+	int tipo;
+	float pot;
+}Vertice;
+
+typedef struct aresta{
+	int origem, destino;
+	float capacidade, fluxo;
 }Aresta;
 
-typedef struct {
-    char nome[100];
-    Aresta*lista;
-}No;
-
-typedef struct{
-    int numNos;
-    No *nos;
+typedef struct grafo{
+	struct vertice *vertices;
+	struct aresta *arestas;
+	int n_verti, n_arest;
 }Grafo;
 
-typedef Grafo *GRF; //so para adoçar
-
-GRF grafo_criar(int numNos);
-void grafo_adicionarAresta(GRF g, int u, int v,int peso);
-void grafo_removerAresta(GRF g, int u, int v);
-void grafo_imprimir(GRF g);
-void grafo_destruir(GRF g);
-void grafo_bfs(GRF g, int origem);
+int procuraVertice(Grafo *g, char nome[]);
+int existeLigacao(Grafo *g, int origem, int destino);
 
 #endif
-
