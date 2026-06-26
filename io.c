@@ -10,6 +10,8 @@ int procuraVertice(Grafo *g, char nome[]){
 		if(strcmp(g->vertices[i].nome, nome) == 0)
 			return 1;
 	}
+
+	return 0;
 }
 
 int existeLigacao(Grafo *g, int origem, int destino){
@@ -33,14 +35,14 @@ int carregaRede(Grafo *g, const char *file){
 	while(fgets(line, sizeof(line), fp)){
 		char tipo[20];
 		
-		sscanf(line, "$s", tipo);
+		sscanf(line, "%s", tipo);
 		
 		//centrais
-		if(strcmp(tipo, "CENTRAL") == 0){
+		if(strcmp(line, "CENTRAL") == 0){
 			char nome[50];
 			float pot;
 			
-			if(sscanf(tipo, "CENTRAL %s %f", nome, &pot) != 2){
+			if(sscanf(line, "CENTRAL %s %f", nome, &pot) != 2){
 				printf("Erro de formato: %s", line);
 				continue;
 			}

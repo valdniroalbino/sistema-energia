@@ -2,7 +2,7 @@
 #define GRAFO_H
 
 typedef struct vertice{
-	char nome;
+	char nome[100];
 	int tipo;
 	float pot;
 }Vertice;
@@ -20,5 +20,22 @@ typedef struct grafo{
 
 int procuraVertice(Grafo *g, char nome[]);
 int existeLigacao(Grafo *g, int origem, int destino);
+
+
+	Grafo *criarGrafo();
+void libertarGrafo(Grafo *g);
+
+
+	int procuraVertice(Grafo *g, char nome[]);
+  int existeLigacao(Grafo *g, int origem, int destino);
+
+		int adicionarVertice(Grafo *g, char nome[], int tipo, float pot);
+    int removerVertice(Grafo *g, char nome[]);
+
+
+      int adicionarAresta(Grafo *g, char origem[], char destino[], float capacidade);
+   int removerAresta(Grafo *g, char origem[], char destino[]);
+
+       void mostrarGrafo(Grafo *g);
 
 #endif
