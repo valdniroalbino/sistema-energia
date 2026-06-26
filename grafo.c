@@ -3,13 +3,12 @@
 #include <string.h>
 #include "grafo.h"
 
- //Criar o grafo
-
+// Criar grafo
 Grafo *criarGrafo()
 {
-    Grafo *g = (Grafo *)malloc(sizeof(Grafo));
+    Grafo *g = malloc(sizeof(Grafo));
     if (g == NULL)
-    return NULL;
+        return NULL;
 
     g->vertices = NULL;
     g->arestas = NULL;
@@ -19,19 +18,18 @@ Grafo *criarGrafo()
     return g;
 }
 
-// Destruir o grafo ou seja, liberação do grafo
-
+// Libertar grafo
 void libertarGrafo(Grafo *g)
 {
-    if (g == NULL) return;
+    if (g == NULL)
+        return;
 
     free(g->vertices);
     free(g->arestas);
     free(g);
 }
 
-//Procurar vertice 
-
+// Procurar vertice
 int procuraVertice(Grafo *g, char nome[])
 {
     for (int i = 0; i < g->n_verti; i++)
@@ -42,8 +40,7 @@ int procuraVertice(Grafo *g, char nome[])
     return -1;
 }
 
-// Verificacao de que existe ligacao 
-
+// Existe ligação
 int existeLigacao(Grafo *g, int origem, int destino)
 {
     for (int i = 0; i < g->n_arest; i++)
@@ -59,14 +56,17 @@ int existeLigacao(Grafo *g, int origem, int destino)
     return 0;
 }
 
-// Adicionar vertices 
-
+// Adicionar vertice
 int adicionarVertice(Grafo *g, char nome[], int tipo, float pot)
 {
     if (procuraVertice(g, nome) != -1)
         return 0;
 
-    g->vertices = realloc(g->vertices, (g->n_verti + 1) * sizeof(Vertice));
+    Vertice *tmp = realloc(g->vertices, (g->n_verti + 1) * sizeof(Vertice));
+    if (tmp == NULL)
+        return 0;
+
+    g->vertices = tmp;
 
     strcpy(g->vertices[g->n_verti].nome, nome);
     g->vertices[g->n_verti].tipo = tipo;
@@ -77,9 +77,7 @@ int adicionarVertice(Grafo *g, char nome[], int tipo, float pot)
     return 1;
 }
 
-
 // Adicionar arestas
-
 int adicionarAresta(Grafo *g, char origem[], char destino[], float capacidade)
 {
     int o = procuraVertice(g, origem);
@@ -91,7 +89,11 @@ int adicionarAresta(Grafo *g, char origem[], char destino[], float capacidade)
     if (existeLigacao(g, o, d))
         return 0;
 
-    g->arestas = realloc(g->arestas, (g->n_arest + 1) * sizeof(Aresta));
+    Aresta *tmp = realloc(g->arestas, (g->n_arest + 1) * sizeof(Aresta));
+    if (tmp == NULL)
+        return 0;
+
+    g->arestas = tmp;
 
     g->arestas[g->n_arest].origem = o;
     g->arestas[g->n_arest].destino = d;
@@ -103,8 +105,7 @@ int adicionarAresta(Grafo *g, char origem[], char destino[], float capacidade)
     return 1;
 }
 
-// Remover arestas
-
+// Remover Arestas
 int removerAresta(Grafo *g, char origem[], char destino[])
 {
     int o = procuraVertice(g, origem);
@@ -113,24 +114,24 @@ int removerAresta(Grafo *g, char origem[], char destino[])
     if (o == -1 || d == -1)
         return 0;
 
-    for (int i = 0; i < g->n_arest; i++)
+    for (int i = 0; i < g->n_arest; )
+{
+    if (g->arestas[i].origem == pos || g->arestas[i].destino == pos)
     {
-        if ((g->arestas[i].origem == o && g->arestas[i].destino == d) ||
-            (g->arestas[i].origem == d && g->arestas[i].destino == o))
-        {
-            for (int j = i; j < g->n_arest - 1; j++)
-                g->arestas[j] = g->arestas[j + 1];
+        for (int j = i; j < g->n_arest - 1; j++)
+            g->arestas[j] = g->arestas[j + 1];
 
-            g->n_arest--;
-            return 1;
-        }
+        g->n_arest--;
     }
-
+    else
+    {
+        i++;
+    }
+}
     return 0;
 }
 
-// Remover vertices
-
+// Remover vertice
 int removerVertice(Grafo *g, char nome[])
 {
     int pos = procuraVertice(g, nome);
@@ -138,15 +139,18 @@ int removerVertice(Grafo *g, char nome[])
     if (pos == -1)
         return 0;
 
-    // remover arestas ligadas ao vértice
-    for (int i = 0; i < g->n_arest; i++)
+    // remover arestas associadas
+    for (int i = 0; i < g->n_arest; )
     {
         if (g->arestas[i].origem == pos || g->arestas[i].destino == pos)
         {
             removerAresta(g,
-                          g->vertices[g->arestas[i].origem].nome,
-                          g->vertices[g->arestas[i].destino].nome);
-            i--;
+                g->vertices[g->arestas[i].origem].nome,
+                g->vertices[g->arestas[i].destino].nome);
+        }
+        else
+        {
+            i++;
         }
     }
 
@@ -156,7 +160,7 @@ int removerVertice(Grafo *g, char nome[])
 
     g->n_verti--;
 
-    // ajustar índices das arestas
+    // atualizar índices das arestas
     for (int i = 0; i < g->n_arest; i++)
     {
         if (g->arestas[i].origem > pos)
@@ -169,11 +173,10 @@ int removerVertice(Grafo *g, char nome[])
     return 1;
 }
 
-// Mostrar o grafo
-
+// Mostrar grafo
 void mostrarGrafo(Grafo *g)
 {
-    printf("\n--- VERTICES ---\n");
+    printf("\n===Vertices====\n");
 
     for (int i = 0; i < g->n_verti; i++)
     {
@@ -184,7 +187,7 @@ void mostrarGrafo(Grafo *g)
                g->vertices[i].pot);
     }
 
-    printf("\n--- ARESTAS ---\n");
+    printf("\n====Arestas====\n");
 
     for (int i = 0; i < g->n_arest; i++)
     {
