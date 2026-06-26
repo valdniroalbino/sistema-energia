@@ -3,11 +3,7 @@
 #include "io.h"
 
 int main(void){
-    Grafo g;
-    g.vertices = NULL;
-    g.arestas  = NULL;
-    g.n_verti  = 0;
-    g.n_arest  = 0;
+    Grafo *g = criarGrafo();
 
     int opcao;
 
@@ -21,12 +17,13 @@ int main(void){
 
         switch(opcao){
             case 1:
-                carregaRede(&g, "rede_electrica.txt");
+                carregaRede(g, "rede_electrica.txt");
                 break;
             case 2:
-                printf("Vertices: %d | Ligacoes: %d\n", g.n_verti, g.n_arest);
+                mostrarGrafo(g);
                 break;
             case 0:
+                libertarGrafo(g);
                 printf("A sair...\n");
                 break;
             default:
