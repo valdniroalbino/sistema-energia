@@ -26,9 +26,6 @@ int existeLigacao(Grafo *g, int origem, int destino);
 void libertarGrafo(Grafo *g);
 
 
-	int procuraVertice(Grafo *g, char nome[]);
-  int existeLigacao(Grafo *g, int origem, int destino);
-
 		int adicionarVertice(Grafo *g, char nome[], int tipo, float pot);
     int removerVertice(Grafo *g, char nome[]);
 

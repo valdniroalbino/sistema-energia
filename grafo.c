@@ -8,6 +8,8 @@
 Grafo *criarGrafo()
 {
     Grafo *g = (Grafo *)malloc(sizeof(Grafo));
+    if (g == NULL)
+    return NULL;
 
     g->vertices = NULL;
     g->arestas = NULL;
