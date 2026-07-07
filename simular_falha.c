@@ -37,7 +37,7 @@ void simularfalhaSubestacao(Grafo *g, char nome[]){
         }
         
     }
-    grafoConexo(g);
+    grafoConexao(g);
     printf("Fluxos devem ser calculados pelo modulo de distribuicao.\n");
     
     

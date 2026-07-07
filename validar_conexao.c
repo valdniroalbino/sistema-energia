@@ -22,7 +22,8 @@ void dfs(Grafo *g, int v, int visitado[]){
 }
 /*usa a pesquisa por profundidade 
 para verificar se a rede permanece conectada apos alteracoes*/
-int grafoConexo(Grafo *g){
+
+int grafoConexao(Grafo *g){
     if(g->n_verti == 0)
         return 1;
     
