@@ -176,6 +176,20 @@ int removerVertice(Grafo *g, char nome[])
 
     g->n_verti--;
 
+    if(g->n_verti > 0)
+{
+    Vertice *tmp = realloc(g->vertices,
+                           g->n_verti * sizeof(Vertice));
+
+    if(tmp != NULL)
+        g->vertices = tmp;
+}
+else
+{
+    free(g->vertices);
+    g->vertices = NULL;
+}
+
     // atualizar índices das arestas
     for (int i = 0; i < g->n_arest; i++)
     {

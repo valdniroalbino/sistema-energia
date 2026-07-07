@@ -4,7 +4,7 @@
 /* Tipos de vértices */
 #define CENTRAL 0
 #define SUBESTACAO 1
-#define CONSUMIDOR 2
+
 
 /* Estrutura do vértice */
 typedef struct vertice

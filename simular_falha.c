@@ -1,4 +1,4 @@
-#include <stdio.h>
+k#include <stdio.h>
 #include <string.h>
 #include "simular_falha.h"
 #include "validar_conexao.h"
