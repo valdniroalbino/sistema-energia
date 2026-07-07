@@ -4,7 +4,14 @@
 #include "distribuicao.h"
 
 
-//Fila Bfs
+#define MAX 1000
+
+
+
+/* ==========================
+        ESTRUTURA DA FILA
+   ========================== */
+
 
 typedef struct
 {
@@ -15,11 +22,13 @@ typedef struct
 } Fila;
 
 
+
 void iniciarFila(Fila *f)
 {
     f->inicio = 0;
     f->fim = 0;
 }
+
 
 
 int filaVazia(Fila *f)
@@ -28,11 +37,16 @@ int filaVazia(Fila *f)
 }
 
 
-void inserirFila(Fila *f, int v)
+
+void inserirFila(Fila *f, int valor)
 {
     if(f->fim < MAX)
-        f->dados[f->fim++] = v;
+    {
+        f->dados[f->fim] = valor;
+        f->fim++;
+    }
 }
+
 
 
 int removerFila(Fila *f)
@@ -41,19 +55,77 @@ int removerFila(Fila *f)
 }
 
 
-//Reiniciar fluxos
+
+
+/* ==========================
+        RESET DOS FLUXOS
+   ========================== */
+
 
 void reiniciarFluxos(Grafo *g)
 {
+
     for(int i = 0; i < g->n_arest; i++)
     {
         g->arestas[i].fluxo = 0;
     }
+
 }
 
 
 
-//Bfs
+/* ==========================
+        CALCULO DO FLUXO
+   ========================== */
+
+
+static float calcularFluxo(Aresta *a, float *energia)
+{
+
+    float disponivel;
+
+
+    /*
+       capacidade ainda disponível
+    */
+
+    disponivel = a->capacidade - a->fluxo;
+
+
+
+    if(disponivel <= 0)
+        return 0;
+
+
+
+    /*
+       não pode enviar mais energia
+       do que a central possui
+    */
+
+    if(disponivel > *energia)
+        disponivel = *energia;
+
+
+
+    a->fluxo += disponivel;
+
+
+    *energia -= disponivel;
+
+
+
+    return disponivel;
+
+}
+
+
+
+
+/* ==========================
+             BFS
+   ========================== */
+
 
 static void bfsDistribuir(Grafo *g, int inicio, float *energia)
 {
@@ -61,25 +133,31 @@ static void bfsDistribuir(Grafo *g, int inicio, float *energia)
     int visitado[MAX] = {0};
 
 
-    Fila f;
-
-    iniciarFila(&f);
+    Fila fila;
 
 
-    inserirFila(&f, inicio);
+    iniciarFila(&fila);
+
+
+
+    inserirFila(&fila, inicio);
+
 
     visitado[inicio] = 1;
 
 
 
-    while(!filaVazia(&f))
+
+    while(!filaVazia(&fila))
     {
 
+
         if(*energia <= 0)
-            break;
+            return;
 
 
-        int atual = removerFila(&f);
+
+        int atual = removerFila(&fila);
 
 
 
@@ -91,13 +169,13 @@ static void bfsDistribuir(Grafo *g, int inicio, float *energia)
 
 
             if(g->arestas[i].origem == atual)
-            {
+
                 vizinho = g->arestas[i].destino;
-            }
+
+
             else if(g->arestas[i].destino == atual)
-            {
+
                 vizinho = g->arestas[i].origem;
-            }
 
 
 
@@ -113,33 +191,33 @@ static void bfsDistribuir(Grafo *g, int inicio, float *energia)
 
             visitado[vizinho] = 1;
 
-            inserirFila(&f, vizinho);
+
+            inserirFila(&fila, vizinho);
 
 
 
-            // A energia é distribuída apenas para subestações
-           
+            /*
+              Distribuição apenas para subestações
+            */
+
 
             if(g->vertices[vizinho].tipo == SUBESTACAO)
             {
 
-                float enviar = g->arestas[i].capacidade;
+                float enviado =
+                calcularFluxo(
+                    &g->arestas[i],
+                    energia
+                );
 
 
-                if(enviar > *energia)
-                    enviar = *energia;
+                printf("\nBFS: %s -> %s",
+                g->vertices[atual].nome,
+                g->vertices[vizinho].nome);
 
 
-
-                // Acumula o fluxo existente
-
-                g->arestas[i].fluxo += enviar;
-
-
-
-                // Retira energia da central
-
-                *energia -= enviar;
+                printf("\nEnergia enviada: %.2f MW\n",
+                enviado);
 
             }
 
@@ -150,7 +228,12 @@ static void bfsDistribuir(Grafo *g, int inicio, float *energia)
 }
 
 
-//Distribuicao Bfs
+
+
+/* ==========================
+        DISTRIBUIÇÃO BFS
+   ========================== */
+
 
 void distribuirCargaBFS(Grafo *g, char origem[])
 {
@@ -161,7 +244,7 @@ void distribuirCargaBFS(Grafo *g, char origem[])
 
     if(inicio == -1)
     {
-        printf("  [ERRO] Central inexistente.\n");
+        printf("Central inexistente.\n");
         return;
     }
 
@@ -169,7 +252,7 @@ void distribuirCargaBFS(Grafo *g, char origem[])
 
     if(g->vertices[inicio].tipo != CENTRAL)
     {
-        printf("  [ERRO] O vertice indicado nao e uma central.\n");
+        printf("O vertice indicado nao e uma central.\n");
         return;
     }
 
@@ -183,22 +266,39 @@ void distribuirCargaBFS(Grafo *g, char origem[])
 
 
 
-    printf("\n  ======= DISTRIBUICAO BFS =======\n");
+    printf("\n========== DISTRIBUICAO BFS ==========\n");
 
 
 
-    bfsDistribuir(g, inicio, &energia);
+    bfsDistribuir(
+        g,
+        inicio,
+        &energia
+    );
 
 
 
-    printf("  Energia restante na central: %.2f MW\n", energia);
+    printf("\nEnergia restante na central: %.2f MW\n",
+    energia);
+
 }
 
 
-//Dfs
 
-static void dfsDistribuir(Grafo *g, int atual, int visitado[], float *energia)
+
+
+/* ==========================
+             DFS
+   ========================== */
+
+
+static void dfsDistribuir(
+        Grafo *g,
+        int atual,
+        int visitado[],
+        float *energia)
 {
+
 
     if(*energia <= 0)
         return;
@@ -217,13 +317,14 @@ static void dfsDistribuir(Grafo *g, int atual, int visitado[], float *energia)
 
 
         if(g->arestas[i].origem == atual)
-        {
+
             vizinho = g->arestas[i].destino;
-        }
+
+
         else if(g->arestas[i].destino == atual)
-        {
+
             vizinho = g->arestas[i].origem;
-        }
+
 
 
 
@@ -237,34 +338,39 @@ static void dfsDistribuir(Grafo *g, int atual, int visitado[], float *energia)
 
 
 
-        // Apenas subestações recebem energia
-        
+        visitado[vizinho] = 1;
+
+
 
         if(g->vertices[vizinho].tipo == SUBESTACAO)
         {
 
-            float enviar = g->arestas[i].capacidade;
+            float enviado =
+            calcularFluxo(
+                &g->arestas[i],
+                energia
+            );
 
 
-
-            if(enviar > *energia)
-                enviar = *energia;
-
-
-
-            // Acumula fluxo
-
-            g->arestas[i].fluxo += enviar;
+            printf("\nDFS: %s -> %s",
+            g->vertices[atual].nome,
+            g->vertices[vizinho].nome);
 
 
-
-            *energia -= enviar;
+            printf("\nEnergia enviada: %.2f MW\n",
+            enviado);
 
         }
 
 
 
-        dfsDistribuir(g, vizinho, visitado, energia);
+        dfsDistribuir(
+            g,
+            vizinho,
+            visitado,
+            energia
+        );
+
 
     }
 
@@ -272,18 +378,23 @@ static void dfsDistribuir(Grafo *g, int atual, int visitado[], float *energia)
 
 
 
-//Distribuicao Dfs
+
+/* ==========================
+        DISTRIBUIÇÃO DFS
+   ========================== */
+
 
 void distribuirCargaDFS(Grafo *g, char origem[])
 {
 
-    int inicio = procuraVertice(g, origem);
+    int inicio =
+    procuraVertice(g, origem);
 
 
 
     if(inicio == -1)
     {
-        printf("  [ERRO] Central inexistente.\n");
+        printf("Central inexistente.\n");
         return;
     }
 
@@ -291,7 +402,7 @@ void distribuirCargaDFS(Grafo *g, char origem[])
 
     if(g->vertices[inicio].tipo != CENTRAL)
     {
-        printf("  [ERRO] O vertice indicado nao e uma central.\n");
+        printf("O vertice indicado nao e uma central.\n");
         return;
     }
 
@@ -301,7 +412,8 @@ void distribuirCargaDFS(Grafo *g, char origem[])
 
 
 
-    float energia = g->vertices[inicio].pot;
+    float energia =
+    g->vertices[inicio].pot;
 
 
 
@@ -309,16 +421,86 @@ void distribuirCargaDFS(Grafo *g, char origem[])
 
 
 
-    printf("\n  ======= DISTRIBUICAO DFS =======\n");
+    printf("\n========== DISTRIBUICAO DFS ==========\n");
 
 
 
-    dfsDistribuir(g, inicio, visitado, &energia);
+    dfsDistribuir(
+        g,
+        inicio,
+        visitado,
+        &energia
+    );
 
 
 
-    printf("  Energia restante na central: %.2f MW\n", energia);
+    printf("\nEnergia restante na central: %.2f MW\n",
+    energia);
 
 }
 
 
+
+
+/* ==========================
+      RELATORIO DA CARGA
+   ========================== */
+
+
+void mostrarEstadoCarga(Grafo *g)
+{
+
+    printf("\n========== ESTADO DA DISTRIBUICAO ==========\n");
+
+
+
+    for(int i = 0; i < g->n_verti; i++)
+    {
+
+
+        if(g->vertices[i].tipo != SUBESTACAO)
+            continue;
+
+
+
+        float recebido = 0;
+
+
+
+        for(int j = 0; j < g->n_arest; j++)
+        {
+
+            if(g->arestas[j].destino == i ||
+               g->arestas[j].origem == i)
+            {
+
+                recebido += g->arestas[j].fluxo;
+
+            }
+
+        }
+
+
+
+        printf("\nSubestacao: %s",
+        g->vertices[i].nome);
+
+
+        printf("\nEnergia recebida: %.2f MW",
+        recebido);
+
+
+
+        if(recebido > 0)
+        {
+            printf("\nEstado: ALIMENTADA\n");
+        }
+        else
+        {
+            printf("\nEstado: SEM ENERGIA\n");
+        }
+
+
+    }
+
+}
