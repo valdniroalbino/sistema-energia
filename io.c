@@ -128,7 +128,7 @@ int carregaRede(Grafo *g, const char *file)
 			int o = procuraVertice(g, origem);
             int d = procuraVertice(g, destino);
 
-            if(g->vertices[o].tipo == 0 && capacidade > g->vertices[o].potencia)
+            if(g->vertices[o].tipo == 0 && capacidade > g->vertices[o].pot)
             {
                 printf("Erro: Capacidade da ligacao %s -> %s excede a potencia da central %s!\n", origem, destino, origem);
                 continue;
