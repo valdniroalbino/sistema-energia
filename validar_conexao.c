@@ -35,13 +35,13 @@ int grafoConexao(Grafo *g){
         if (!visitado[i])
         {
             free(visitado);
-            printf("ERRO: A rede ficou desconexa.\n");
+            printf("  [ERRO] A rede ficou desconexa.\n");
             return 0;
         }
         
     }
     free(visitado);
-    printf("Rede válida.\nTodos os nós estão conectados.\n");
+    printf("  [OK] Rede valida. Todos os nos estao conectados.\n");
     return 1;
     
 }

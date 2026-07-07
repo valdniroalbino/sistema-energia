@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "grafo.h"
 #include "io.h"
 #include "distribuicao.h"
@@ -15,20 +16,31 @@ int main(void) {
     int total;
     char nome[50];
 
-    mostrarCabecalho();
+    //mostrarCabecalho();
 
     do {
+        system("clear");
+        mostrarCabecalho();
         mostrarMenu();
         scanf("%d", &opcao);
 
         switch(opcao) {
             case 1:
+                if(g->n_verti > 0) {
+                    libertarGrafo(g);
+                    g = criarGrafo();
+                }
                 carregaRede(g, "rede_electrica.txt");
+                pausa();
                 break;
             case 2:
+                if(!redeCarregada(g)) break;
                 mostrarGrafo(g);
+                pausa();
+    
                 break;
             case 3:
+                if(!redeCarregada(g)) break;
                 mostrarSubmenuCarga();
                 scanf("%d", &sub);
                 total = mostrarCentrais(g);
@@ -36,6 +48,7 @@ int main(void) {
                 scanf("%d", &escolha);
                 if(escolha < 1 || escolha > total) {
                     printf("  Opcao invalida.\n");
+                    pausa();
                     break;
                 }
                 opcaoVertice(g, CENTRAL, escolha, nome);
@@ -45,8 +58,10 @@ int main(void) {
                     distribuirCargaDFS(g, nome);
                 else
                     printf("  Opcao invalida.\n");
+                pausa();
                 break;
             case 4:
+                if(!redeCarregada(g)) break;
                 mostrarSubmenuFalha();
                 scanf("%d", &sub);
                 if(sub == 1) {
@@ -55,6 +70,7 @@ int main(void) {
                     scanf("%d", &escolha);
                     if(escolha < 1 || escolha > total) {
                         printf("  Opcao invalida.\n");
+                        pausa();
                         break;
                     }
                     opcaoVertice(g, SUBESTACAO, escolha, nome);
@@ -65,6 +81,7 @@ int main(void) {
                     scanf("%d", &escolha);
                     if(escolha < 1 || escolha > total) {
                         printf("  Opcao invalida.\n");
+                        pausa();
                         break;
                     }
                     opcaoVertice(g, CENTRAL, escolha, nome);
@@ -72,12 +89,14 @@ int main(void) {
                 } else {
                     printf("  Opcao invalida.\n");
                 }
+                pausa();
                 break;
             case 0:
                 libertarGrafo(g);
-                printf("\n  Ate logo!\n\n");
+                printf("\n  Obrigado por usar o Sistema de Gestao da RNT.\n  Boa continuacao!\n");
                 break;
             default:
+            pausa();
                 printf("  Opcao invalida.\n");
         }
 

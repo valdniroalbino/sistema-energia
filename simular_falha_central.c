@@ -13,7 +13,7 @@ void simularFalhaCentral(Grafo *g, char central[]){
     // Verificar se a central existe
 
     if(pos == -1){
-        printf("\nCentral inexistente.\n");
+        printf("  [ERRO] Central inexistente.\n");
         return;
     }
 
@@ -21,15 +21,15 @@ void simularFalhaCentral(Grafo *g, char central[]){
     // Verificar se é realmente uma central
 
             if(g->vertices[pos].tipo != CENTRAL){
-        printf("\nO vertice indicado nao e uma central.\n");
+        printf("  [ERRO] O vertice indicado nao e uma central.\n");
         return;
     }
 
 
 
-        printf("\n===== SIMULACAO DE FALHA =====\n");
+        printf("\n  ===== SIMULACAO DE FALHA =====\n");
 
-        printf("Central afetada: %s\n", g->vertices[pos].nome);
+        printf("  Central afectada: %s\n", g->vertices[pos].nome);
 
 
 
@@ -45,7 +45,7 @@ void simularFalhaCentral(Grafo *g, char central[]){
 
 
 
-    printf("Potencia perdida: %.2f MW\n", potenciaAnterior);
+    printf("  Potencia perdida: %.2f MW\n", potenciaAnterior);
 
 
 
@@ -59,7 +59,7 @@ void simularFalhaCentral(Grafo *g, char central[]){
 
 
 
-    printf("\nRedistribuindo carga pelas centrais disponiveis...\n");
+    printf("  Redistribuindo carga pelas centrais disponiveis...\n");
 
 
 
@@ -75,8 +75,7 @@ for(int i = 0; i < g->n_verti; i++){
             encontrouCentral = 1;
 
 
-            printf("\nNova central de alimentacao: %s\n",
-                   g->vertices[i].nome);
+            printf("  Nova central de alimentacao: %s\n", g->vertices[i].nome);
 
 
 
@@ -89,15 +88,15 @@ for(int i = 0; i < g->n_verti; i++){
 
 if(!encontrouCentral){
 
-        printf("\nNao existem outras centrais disponiveis.\n");
+        printf("  [AVISO] Nao existem outras centrais disponiveis.\n");
 
-        printf("Os consumidores ficaram sem alimentacao.\n");
+        printf("  As subestacoes ficaram sem alimentacao.\n");
 
     }
 
 
 
-    printf("\n===== FIM DA SIMULACAO =====\n");
+    printf("\n  ===== FIM DA SIMULACAO =====\n");
 
 
     mostrarEstadoCarga(g);

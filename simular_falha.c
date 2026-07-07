@@ -17,7 +17,7 @@ void simularfalhaSubestacao(Grafo *g, char nome[]){
     }
     if (index == -1)
     {
-        printf("Subestacao nao encontrada!\n");
+        printf("  [ERRO] Subestacao nao encontrada!\n");
         return;
     }
     if (g->vertices[index].tipo!=1)
@@ -26,7 +26,7 @@ void simularfalhaSubestacao(Grafo *g, char nome[]){
         return;
     }
     
-    printf("Falha na subestacao %s!\n",nome);
+    printf("\n  [FALHA] Subestacao %s afectada!\n", nome);
 
     for (int i = 0; i < g->n_arest; i++)
     {
@@ -38,7 +38,7 @@ void simularfalhaSubestacao(Grafo *g, char nome[]){
         
     }
     grafoConexao(g);
-    printf("Fluxos devem ser calculados pelo modulo de distribuicao.\n");
+    printf("  Recalcular fluxos com a opcao Equilibrar Carga.\n");
     
     
 }

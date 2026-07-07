@@ -17,6 +17,7 @@ void mostrarMenu(void) {
     printf("  [3] Equilibrar carga\n");
     printf("  [4] Simular falha\n");
     printf("  [0] Sair\n");
+    printf("\n  --------------------------------------\n");
     printf("\n  Opcao: ");
 }
 
@@ -40,7 +41,7 @@ int mostrarCentrais(Grafo *g) {
     int contador = 0;
     printf("\n  Centrais disponiveis:\n");
     for(int i = 0; i < g->n_verti; i++) {
-        if(g->vertices[i].tipo == CENTRAL) {
+        if(g->vertices[i].tipo == CENTRAL && g->vertices[i].pot > 0) {
             contador++;
             printf("  [%d] %s (%.2f MW)\n", contador, g->vertices[i].nome, g->vertices[i].pot);
         }
@@ -73,4 +74,18 @@ void opcaoVertice(Grafo *g, int tipo, int escolha, char nome[]) {
             }
         }
     }
+}
+
+int redeCarregada(Grafo *g) {
+    if(g->n_verti == 0) {
+        printf("\n  [AVISO] Carregue a rede primeiro. (opcao 1)\n");
+        return 0;
+    }
+    return 1;
+}
+
+void pausa(void) {
+    printf("\n  Prima qualquer tecla para continuar...");
+    getchar();
+    getchar();
 }

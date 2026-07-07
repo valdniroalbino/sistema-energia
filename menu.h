@@ -10,5 +10,7 @@ void mostrarSubmenuFalha(void);
 int mostrarCentrais(Grafo *g);
 int mostrarSubestacoes(Grafo *g);
 void opcaoVertice(Grafo *g, int tipo, int escolha, char nome[]);
+int redeCarregada(Grafo *g) ;
+void pausa(void);
 
 #endif

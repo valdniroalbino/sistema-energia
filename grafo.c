@@ -192,25 +192,27 @@ int removerVertice(Grafo *g, char nome[])
 // Mostrar grafo
 void mostrarGrafo(Grafo *g)
 {
-    printf("\n===Vertices====\n");
+    printf("\n  ========== ESTADO DA REDE ==========\n\n  Vertices:\n");
 
     for (int i = 0; i < g->n_verti; i++)
     {
-        printf("%d - %s | tipo: %d | pot: %.2f\n",
-               i,
-               g->vertices[i].nome,
-               g->vertices[i].tipo,
-               g->vertices[i].pot);
+        printf("  %d - %s | %s | %.2f MW\n",
+        i,
+        g->vertices[i].nome,
+        g->vertices[i].tipo == CENTRAL ? "CENTRAL" : "SUBESTACAO",
+        g->vertices[i].pot);
     }
 
-    printf("\n====Arestas====\n");
+    printf("\n  Ligacoes:\n");
 
     for (int i = 0; i < g->n_arest; i++)
     {
-        printf("%s <-> %s | cap: %.2f | fluxo: %.2f\n",
+        printf("  %s <-> %s | cap: %.2f MW | fluxo: %.2f MW\n",
                g->vertices[g->arestas[i].origem].nome,
                g->vertices[g->arestas[i].destino].nome,
                g->arestas[i].capacidade,
                g->arestas[i].fluxo);
     }
+
+    printf("\n  =====================================\n");
 }
