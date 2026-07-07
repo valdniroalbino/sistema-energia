@@ -24,7 +24,7 @@ int main(void){
         system("clear");
         mostrarCabecalho();
         mostrarMenu();
-        scanf("%d", &opcao);
+        opcao = lerOpcao();
 
         switch(opcao){
             case 1:
@@ -48,11 +48,11 @@ int main(void){
             /* Verificar se a rede foi carregada antes de equilibrar */
                 if(!redeCarregada(g)) break;
                 mostrarSubmenuCarga();
-                scanf("%d", &sub);
+                sub = lerOpcao();
                 /* Mostrar centrais e obter escolha do utilizador */
                 total = mostrarCentrais(g);
                 printf("  Escolha a central: ");
-                scanf("%d", &escolha);
+                escolha = lerOpcao();
                 if(escolha < 1 || escolha > total) {
                     printf("  Opcao invalida.\n");
                     pausa();
@@ -72,12 +72,12 @@ int main(void){
             /* Verificar se a rede foi carregada antes de simular */
                 if(!redeCarregada(g)) break;
                 mostrarSubmenuFalha();
-                scanf("%d", &sub);
+                sub = lerOpcao();
                 if(sub == 1){
                     /* Simular falha de subestacao */
                     total = mostrarSubestacoes(g);
                     printf("  Escolha a subestacao: ");
-                    scanf("%d", &escolha);
+                    escolha = lerOpcao();
                     if(escolha < 1 || escolha > total) {
                         printf("  Opcao invalida.\n");
                         pausa();
@@ -89,7 +89,7 @@ int main(void){
                     /* Simular falha de central */
                     total = mostrarCentrais(g);
                     printf("  Escolha a central: ");
-                    scanf("%d", &escolha);
+                    escolha = lerOpcao();
                     if(escolha < 1 || escolha > total) {
                         printf("  Opcao invalida.\n");
                         pausa();
@@ -108,8 +108,9 @@ int main(void){
                 printf("\n  Obrigado por usar o Sistema de Gestao da RNT.\n  Boa continuacao!\n");
                 break;
             default:
-            pausa();
-                printf("  Opcao invalida.\n");
+               printf("  Opcao invalida.\n");
+                pausa();
+            
         }
 
     }while(opcao != 0);

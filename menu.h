@@ -20,5 +20,7 @@ void opcaoVertice(Grafo *g, int tipo, int escolha, char nome[]);
 int redeCarregada(Grafo *g) ;
 //Aguarda que o utilizador prima uma tecla para continuar
 void pausa(void);
+/* Le uma opcao do utilizador de forma segura contra letras e caracteres invalidos */
+int lerOpcao(void);
 
 #endif

@@ -101,3 +101,15 @@ void pausa(void){
     getchar();
     getchar();
 }
+
+/* Le um numero inteiro de forma segura.
+   Se o utilizador digitar uma letra, limpa o buffer e retorna -1 */
+int lerOpcao(void){
+    int opcao;
+    if(scanf("%d", &opcao) != 1){
+        /* Limpar o buffer para nao entrar em loop */
+        while(getchar() != '\n');
+        return -1;
+    }
+    return opcao;
+}
