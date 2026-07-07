@@ -5,6 +5,7 @@
 #include "grafo.h"
 
 #define MAX_LINE 100
+#define MAX_POT 1000
 
 int carregaRede(Grafo *g, const char *file)
 {
@@ -40,6 +41,11 @@ int carregaRede(Grafo *g, const char *file)
                 printf("Erro: Potencia da central %s invalida!\n", nome);
                 continue;
             }
+            if (pot > MAX_POT)
+            {
+                printf("Erro: Potencia da central %s excede o limite permitido!\n", nome);
+                continue;
+            }
 
             if (procuraVertice(g, nome) != -1)
             {
@@ -65,6 +71,12 @@ int carregaRede(Grafo *g, const char *file)
             if (pot <= 0)
             {
                 printf("Erro: Carga da subestacao %s invalida!\n", nome);
+                continue;
+            }
+
+            if (pot > MAX_POT)
+            {
+                printf("Erro: Carga da subestacao %s excede o limite permitido!\n", nome);
                 continue;
             }
 
@@ -94,6 +106,12 @@ int carregaRede(Grafo *g, const char *file)
                 printf("Erro: Capacidade invalida!\n");
                 continue;
             }
+            if (strcmp(origem, destino)==0)
+            {
+                printf("Erro: Ligacao %s invalida(Liga a si mesma)!\n", origem);
+                continue;
+            }
+            
 
             if (procuraVertice(g, origem) == -1)
             {
@@ -108,7 +126,16 @@ int carregaRede(Grafo *g, const char *file)
             }
 
 			int o = procuraVertice(g, origem);
-             int d = procuraVertice(g, destino);
+            int d = procuraVertice(g, destino);
+
+            if(g->vertices[o].tipo == 0 && capacidade > g->vertices[o].potencia)
+            {
+                printf("Erro: Capacidade da ligacao %s -> %s excede a potencia da central %s!\n", origem, destino, origem);
+                continue;
+            }
+            {
+
+            }
 
          if (existeLigacao(g, o, d))
             {

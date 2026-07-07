@@ -3,6 +3,8 @@
 #include "simular_falha.h"
 #include "validar_conexao.h"
 
+/*identifica subestacao pelo nome e desativa as conexoes,
+verificando se a rede continua conectada*/
 void simularfalhaSubestacao(Grafo *g, char nome[]){
     int index = -1;
 

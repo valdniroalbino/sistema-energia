@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include "validar_conexao.h"
 
-//wis, essa funcao percorre o grafo para verificar se todos os vertices estao conectados
+/*pesquisa por profundidade
+essa funcao percorre o grafo para verificar se todos os vertices estao conectados*/
 void dfs(Grafo *g, int v, int visitado[]){
     visitado[v] = 1;
     for(int i=0; i < g->n_arest; i++){
@@ -14,9 +15,13 @@ void dfs(Grafo *g, int v, int visitado[]){
         if (g->arestas[i].destino == v)
         {
             int origem = g->arestas[i].origem;
+            if(!visitado[origem])
+                dfs(g, origem, visitado);
         }   
     }
 }
+/*usa a pesquisa por profundidade 
+para verificar se a rede permanece conectada apos alteracoes*/
 
 int grafoConexao(Grafo *g){
     if(g->n_verti == 0)
