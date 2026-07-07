@@ -9,7 +9,7 @@
 EstadoCarga carga[MAX];
 
 
-/* ===================== FILA ===================== */
+/* Fila */
 
 typedef struct {
 
@@ -46,7 +46,7 @@ int removerFila(Fila *f)
 }
 
 
-/* ===================== RESET ===================== */
+/* Reset ou reiniciar  */
 
 void reiniciarFluxos(Grafo *g)
 {
