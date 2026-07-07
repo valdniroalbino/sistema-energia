@@ -18,7 +18,7 @@ void dfs(Grafo *g, int v, int visitado[]){
     }
 }
 
-int grafoConexo(Grafo *g){
+int grafoConexao(Grafo *g){
     if(g->n_verti == 0)
         return 1;
     

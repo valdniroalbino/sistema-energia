@@ -1,0 +1,9 @@
+cat > rede_electrica.txt << 'EOF'
+CENTRAL Central_A 500
+CENTRAL Central_B 300
+SUBESTACAO Sub_1 120
+SUBESTACAO Sub_2 80
+LIGACAO Central_A Sub_1 100
+LIGACAO Central_A Sub_2 60
+LIGACAO Central_B Sub_2 80
+EOF
