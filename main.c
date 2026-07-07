@@ -8,7 +8,8 @@
 #include "validar_conexao.h"
 #include "menu.h"
 
-int main(void) {
+int main(void){
+    /* Criar o grafo vazio no inicio do programa */
     Grafo *g = criarGrafo();
     int opcao;
     int sub;
@@ -18,14 +19,16 @@ int main(void) {
 
     //mostrarCabecalho();
 
-    do {
+    do{
+        /* Limpar o ecra e mostrar o cabecalho e menu a cada iteracao */
         system("clear");
         mostrarCabecalho();
         mostrarMenu();
         scanf("%d", &opcao);
 
-        switch(opcao) {
+        switch(opcao){
             case 1:
+            /* Se ja existe uma rede carregada, libertar antes de carregar de novo */
                 if(g->n_verti > 0) {
                     libertarGrafo(g);
                     g = criarGrafo();
@@ -34,15 +37,19 @@ int main(void) {
                 pausa();
                 break;
             case 2:
+            /* Verificar se a rede foi carregada antes de mostrar */
+
                 if(!redeCarregada(g)) break;
                 mostrarGrafo(g);
                 pausa();
     
                 break;
             case 3:
+            /* Verificar se a rede foi carregada antes de equilibrar */
                 if(!redeCarregada(g)) break;
                 mostrarSubmenuCarga();
                 scanf("%d", &sub);
+                /* Mostrar centrais e obter escolha do utilizador */
                 total = mostrarCentrais(g);
                 printf("  Escolha a central: ");
                 scanf("%d", &escolha);
@@ -51,6 +58,7 @@ int main(void) {
                     pausa();
                     break;
                 }
+                /* Converter escolha numerica no nome da central */
                 opcaoVertice(g, CENTRAL, escolha, nome);
                 if(sub == 1)
                     distribuirCargaBFS(g, nome);
@@ -61,10 +69,12 @@ int main(void) {
                 pausa();
                 break;
             case 4:
+            /* Verificar se a rede foi carregada antes de simular */
                 if(!redeCarregada(g)) break;
                 mostrarSubmenuFalha();
                 scanf("%d", &sub);
-                if(sub == 1) {
+                if(sub == 1){
+                    /* Simular falha de subestacao */
                     total = mostrarSubestacoes(g);
                     printf("  Escolha a subestacao: ");
                     scanf("%d", &escolha);
@@ -75,7 +85,8 @@ int main(void) {
                     }
                     opcaoVertice(g, SUBESTACAO, escolha, nome);
                     simularfalhaSubestacao(g, nome);
-                } else if(sub == 2) {
+                }else if(sub == 2){
+                    /* Simular falha de central */
                     total = mostrarCentrais(g);
                     printf("  Escolha a central: ");
                     scanf("%d", &escolha);
@@ -86,12 +97,13 @@ int main(void) {
                     }
                     opcaoVertice(g, CENTRAL, escolha, nome);
                     simularFalhaCentral(g, nome);
-                } else {
+                }else{
                     printf("  Opcao invalida.\n");
                 }
                 pausa();
                 break;
             case 0:
+            /* Libertar memoria e terminar o programa com uma mensagem*/
                 libertarGrafo(g);
                 printf("\n  Obrigado por usar o Sistema de Gestao da RNT.\n  Boa continuacao!\n");
                 break;
@@ -100,7 +112,7 @@ int main(void) {
                 printf("  Opcao invalida.\n");
         }
 
-    } while(opcao != 0);
+    }while(opcao != 0);
 
     return 0;
 }

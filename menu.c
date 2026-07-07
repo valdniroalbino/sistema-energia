@@ -2,7 +2,7 @@
 #include <string.h>
 #include "menu.h"
 
-void mostrarCabecalho(void) {
+void mostrarCabecalho(void){
     printf("\n");
     printf("╔══════════════════════════════════════════╗\n");
     printf("║     RNT - Rede Nacional de Transporte    ║\n");
@@ -10,7 +10,7 @@ void mostrarCabecalho(void) {
     printf("╚══════════════════════════════════════════╝\n");
 }
 
-void mostrarMenu(void) {
+void mostrarMenu(void){
     printf("\n");
     printf("  [1] Carregar rede do ficheiro\n");
     printf("  [2] Mostrar estado da rede\n");
@@ -21,7 +21,7 @@ void mostrarMenu(void) {
     printf("\n  Opcao: ");
 }
 
-void mostrarSubmenuCarga(void) {
+void mostrarSubmenuCarga(void){
     printf("\n");
     printf("  -- Equilibrar Carga --\n");
     printf("  [1] BFS\n");
@@ -29,7 +29,7 @@ void mostrarSubmenuCarga(void) {
     printf("  Opcao: ");
 }
 
-void mostrarSubmenuFalha(void) {
+void mostrarSubmenuFalha(void){
     printf("\n");
     printf("  -- Simular Falha --\n");
     printf("  [1] Falha de subestacao\n");
@@ -37,10 +37,13 @@ void mostrarSubmenuFalha(void) {
     printf("  Opcao: ");
 }
 
-int mostrarCentrais(Grafo *g) {
+/* Percorre os vertices e lista apenas as centrais com potencia disponivel
+   Retorna o total de centrais encontradas */
+int mostrarCentrais(Grafo *g){
     int contador = 0;
     printf("\n  Centrais disponiveis:\n");
     for(int i = 0; i < g->n_verti; i++) {
+        /* Filtra centrais com potencia maior que zero */
         if(g->vertices[i].tipo == CENTRAL && g->vertices[i].pot > 0) {
             contador++;
             printf("  [%d] %s (%.2f MW)\n", contador, g->vertices[i].nome, g->vertices[i].pot);
@@ -50,10 +53,12 @@ int mostrarCentrais(Grafo *g) {
     return contador;
 }
 
-int mostrarSubestacoes(Grafo *g) {
+/* Percorre os vertices e lista apenas as subestacoes
+   Retorna o total de subestacoes encontradas */
+int mostrarSubestacoes(Grafo *g){
     int contador = 0;
     printf("\n  Subestacoes disponiveis:\n");
-    for(int i = 0; i < g->n_verti; i++) {
+    for(int i = 0; i < g->n_verti; i++){
         if(g->vertices[i].tipo == SUBESTACAO) {
             contador++;
             printf("  [%d] %s (%.2f MW)\n", contador, g->vertices[i].nome, g->vertices[i].pot);
@@ -63,11 +68,14 @@ int mostrarSubestacoes(Grafo *g) {
     return contador;
 }
 
-void opcaoVertice(Grafo *g, int tipo, int escolha, char nome[]) {
+/* Converte a escolha numerica do utilizador no nome do vertice correspondente
+   Percorre os vertices do tipo indicado e copia o nome quando encontra a posicao certa */
+void opcaoVertice(Grafo *g, int tipo, int escolha, char nome[]){
     int contador = 0;
-    for(int i = 0; i < g->n_verti; i++) {
-        if(g->vertices[i].tipo == tipo) {
+    for(int i = 0; i < g->n_verti; i++){
+        if(g->vertices[i].tipo == tipo){
             contador++;
+            /* Quando o contador corresponde a escolha, copia o nome e termina */
             if(contador == escolha) {
                 strcpy(nome, g->vertices[i].nome);
                 return;
@@ -76,7 +84,9 @@ void opcaoVertice(Grafo *g, int tipo, int escolha, char nome[]) {
     }
 }
 
-int redeCarregada(Grafo *g) {
+/* Verifica se a rede foi carregada antes de executar qualquer operacao
+   Retorna 1 se a rede tem vertices, 0 caso contrario */
+int redeCarregada(Grafo *g){
     if(g->n_verti == 0) {
         printf("\n  [AVISO] Carregue a rede primeiro. (opcao 1)\n");
         return 0;
@@ -84,7 +94,9 @@ int redeCarregada(Grafo *g) {
     return 1;
 }
 
-void pausa(void) {
+/* Aguarda que o utilizador prima uma tecla antes de voltar ao menu
+   O primeiro getchar limpa o Enter que ficou no buffer do scanf */
+void pausa(void){
     printf("\n  Prima qualquer tecla para continuar...");
     getchar();
     getchar();
