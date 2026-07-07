@@ -8,229 +8,395 @@
 
 EstadoCarga carga[MAX];
 
+
 /* ===================== FILA ===================== */
 
 typedef struct {
+
     int dados[MAX];
     int inicio;
     int fim;
+
 } Fila;
 
-void iniciarFila(Fila *f) {
+
+void iniciarFila(Fila *f)
+{
     f->inicio = 0;
     f->fim = 0;
 }
 
-int filaVazia(Fila *f) {
+
+int filaVazia(Fila *f)
+{
     return f->inicio == f->fim;
 }
 
-void inserirFila(Fila *f, int v) {
-    f->dados[f->fim++] = v;
+
+void inserirFila(Fila *f, int v)
+{
+    if(f->fim < MAX)
+        f->dados[f->fim++] = v;
 }
 
-int removerFila(Fila *f) {
+
+int removerFila(Fila *f)
+{
     return f->dados[f->inicio++];
 }
 
+
 /* ===================== RESET ===================== */
 
-void reiniciarFluxos(Grafo *g) {
+void reiniciarFluxos(Grafo *g)
+{
 
-    for (int i = 0; i < g->n_arest; i++)
+    for(int i = 0; i < g->n_arest; i++)
         g->arestas[i].fluxo = 0;
 
-    for (int i = 0; i < g->n_verti; i++) {
+
+    for(int i = 0; i < g->n_verti; i++)
+    {
         carga[i].recebido = 0;
         carga[i].estado = 0;
     }
+
 }
 
-/* ===================== BFS ===================== */
 
-void distribuirCargaBFS(Grafo *g, char origem[]) {
+/* Processar consumidor */
+
+static void processarConsumidor(Grafo *g, int vizinho, int aresta, float *energia)
+{
+
+    float necessidade = g->vertices[vizinho].pot;
+
+    float enviar = necessidade;
+
+
+    // Limite pela energia disponível
+
+    if(enviar > *energia)
+        enviar = *energia;
+
+
+    // Limite pela capacidade da ligação
+
+    if(enviar > g->arestas[aresta].capacidade)
+        enviar = g->arestas[aresta].capacidade;
+
+
+
+    // Atualizar fluxo
+
+    g->arestas[aresta].fluxo += enviar;
+
+
+
+    // Atualizar energia disponível
+
+    *energia -= enviar;
+
+
+
+    // Atualizar consumidor
+
+    carga[vizinho].recebido += enviar;
+
+
+
+    if(enviar == 0)
+
+        carga[vizinho].estado = 0;
+
+
+    else if(enviar < necessidade)
+
+        carga[vizinho].estado = 1;
+
+
+    else
+
+        carga[vizinho].estado = 2;
+
+
+
+    printf("\nConsumidor: %s", g->vertices[vizinho].nome);
+    printf("\nNecessita : %.2f MW", necessidade);
+    printf("\nRecebeu   : %.2f MW", enviar);
+    printf("\nEnergia restante: %.2f MW\n", *energia);
+
+}
+
+
+/* Bfs interno */
+
+static void bfsDistribuir(Grafo *g, int inicio, float *energia)
+{
+
+    int visitado[MAX] = {0};
+
+
+    Fila f;
+
+    iniciarFila(&f);
+
+
+    inserirFila(&f, inicio);
+
+    visitado[inicio] = 1;
+
+
+
+    while(!filaVazia(&f))
+    {
+
+        int atual = removerFila(&f);
+
+
+
+        for(int i = 0; i < g->n_arest; i++)
+        {
+
+            int vizinho = -1;
+
+
+
+            if(g->arestas[i].origem == atual)
+
+                vizinho = g->arestas[i].destino;
+
+
+            else if(g->arestas[i].destino == atual)
+
+                vizinho = g->arestas[i].origem;
+
+
+
+            if(vizinho == -1)
+
+                continue;
+
+
+
+            if(visitado[vizinho])
+
+                continue;
+
+
+
+            visitado[vizinho] = 1;
+
+
+            inserirFila(&f, vizinho);
+
+
+
+            if(g->vertices[vizinho].tipo == CONSUMIDOR)
+
+            {
+                processarConsumidor(g, vizinho, i, energia);
+            }
+
+        }
+
+    }
+
+}
+
+
+
+/* Distribuicao Bfs*/
+
+void distribuirCargaBFS(Grafo *g, char origem[])
+{
 
     int inicio = procuraVertice(g, origem);
 
-    if (inicio == -1) {
+
+
+    if(inicio == -1)
+    {
         printf("Central inexistente.\n");
         return;
     }
 
-    if (g->vertices[inicio].tipo != CENTRAL) {
+
+
+    if(g->vertices[inicio].tipo != CENTRAL)
+    {
         printf("O vertice indicado nao e uma central.\n");
         return;
     }
 
+
+
     reiniciarFluxos(g);
 
+
+
     float energia = g->vertices[inicio].pot;
-    float energiaInicial = energia;
 
-    int visitado[MAX] = {0};
-    int consumidores = 0;
-    int atendidos = 0;
 
-    Fila f;
-    iniciarFila(&f);
-
-    inserirFila(&f, inicio);
 
     printf("\n======= DISTRIBUICAO BFS =======\n");
 
-    while (!filaVazia(&f)) {
 
-        int atual = removerFila(&f);
 
-        for (int i = 0; i < g->n_arest; i++) {
+    bfsDistribuir(g, inicio, &energia);
 
-            int vizinho = -1;
 
-            if (g->arestas[i].origem == atual)
-                vizinho = g->arestas[i].destino;
-            else if (g->arestas[i].destino == atual)
-                vizinho = g->arestas[i].origem;
 
-            if (vizinho == -1)
-                continue;
+    printf("\nEnergia restante na central: %.2f MW\n", energia);
 
-            if (visitado[vizinho])
-                continue;
-
-            visitado[vizinho] = 1;
-            inserirFila(&f, vizinho);
-
-            if (g->vertices[vizinho].tipo == CONSUMIDOR) {
-
-                consumidores++;
-
-                float necessidade = g->vertices[vizinho].pot;
-
-                float enviar = necessidade;
-
-                if (enviar > energia)
-                    enviar = energia;
-
-                if (enviar > g->arestas[i].capacidade)
-                    enviar = g->arestas[i].capacidade;
-
-                g->arestas[i].fluxo += enviar;
-
-                energia -= enviar;
-
-                carga[vizinho].recebido += enviar;
-
-                if (enviar == necessidade)
-                    carga[vizinho].estado = 2;
-                else if (enviar > 0)
-                    carga[vizinho].estado = 1;
-                else
-                    carga[vizinho].estado = 0;
-
-                if (enviar == necessidade)
-                    atendidos++;
-
-                printf("\nConsumidor: %s", g->vertices[vizinho].nome);
-                printf("\nRecebeu   : %.2f MW", enviar);
-                printf("\nRestante  : %.2f MW\n", energia);
-            }
-        }
-    }
-
-    printf("\nEnergia inicial: %.2f MW", energiaInicial);
-    printf("\nEnergia final  : %.2f MW", energia);
-    printf("\nTaxa de atendimento: %.2f%%\n",
-           consumidores > 0 ? (atendidos * 100.0 / consumidores) : 0);
 }
 
-/* ===================== DFS ===================== */
 
-static void dfs(Grafo *g, int atual, int visitado[], float *energia) {
+
+/* Dfs interno */
+
+static void dfsDistribuir(Grafo *g, int atual, int visitado[], float *energia)
+{
 
     visitado[atual] = 1;
 
-    for (int i = 0; i < g->n_arest; i++) {
+
+
+    for(int i = 0; i < g->n_arest; i++)
+    {
 
         int vizinho = -1;
 
-        if (g->arestas[i].origem == atual)
+
+
+        if(g->arestas[i].origem == atual)
+
             vizinho = g->arestas[i].destino;
-        else if (g->arestas[i].destino == atual)
+
+
+        else if(g->arestas[i].destino == atual)
+
             vizinho = g->arestas[i].origem;
 
-        if (vizinho == -1 || visitado[vizinho])
+
+
+        if(vizinho == -1)
+
             continue;
 
-        if (g->vertices[vizinho].tipo == CONSUMIDOR) {
 
-            float enviar = g->vertices[vizinho].pot;
 
-            if (enviar > *energia)
-                enviar = *energia;
+        if(visitado[vizinho])
 
-            if (enviar > g->arestas[i].capacidade)
-                enviar = g->arestas[i].capacidade;
+            continue;
 
-            g->arestas[i].fluxo += enviar;
 
-            *energia -= enviar;
 
-            carga[vizinho].recebido += enviar;
+        if(g->vertices[vizinho].tipo == CONSUMIDOR)
 
-            if (enviar == g->vertices[vizinho].pot)
-                carga[vizinho].estado = 2;
-            else if (enviar > 0)
-                carga[vizinho].estado = 1;
-            else
-                carga[vizinho].estado = 0;
+        {
+            processarConsumidor(g, vizinho, i, energia);
         }
 
-        dfs(g, vizinho, visitado, energia);
+
+
+        dfsDistribuir(g, vizinho, visitado, energia);
+
     }
+
 }
 
-/* ===================== DFS MAIN ===================== */
 
-void distribuirCargaDFS(Grafo *g, char origem[]) {
+
+/* Distribuicao Dfs*/
+
+void distribuirCargaDFS(Grafo *g, char origem[])
+{
 
     int inicio = procuraVertice(g, origem);
 
-    if (inicio == -1)
-        return;
 
-    if (g->vertices[inicio].tipo != CENTRAL) {
+
+    if(inicio == -1)
+    {
+        printf("Central inexistente.\n");
+        return;
+    }
+
+
+
+    if(g->vertices[inicio].tipo != CENTRAL)
+    {
         printf("O vertice indicado nao e uma central.\n");
         return;
     }
 
+
+
     reiniciarFluxos(g);
+
+
 
     float energia = g->vertices[inicio].pot;
 
+
+
     int visitado[MAX] = {0};
 
-    dfs(g, inicio, visitado, &energia);
+
+
+    printf("\n======= DISTRIBUICAO DFS =======\n");
+
+
+
+    dfsDistribuir(g, inicio, visitado, &energia);
+
+
+
+    printf("\nEnergia restante na central: %.2f MW\n", energia);
+
 }
 
-/* ===================== RELATORIO ===================== */
 
-void mostrarEstadoCarga(Grafo *g) {
+
+/* Relatorio */
+
+void mostrarEstadoCarga(Grafo *g)
+{
 
     printf("\n========== ESTADO DA DISTRIBUICAO ==========\n");
 
-    for (int i = 0; i < g->n_verti; i++) {
 
-        if (g->vertices[i].tipo != CONSUMIDOR)
+
+    for(int i = 0; i < g->n_verti; i++)
+    {
+
+        if(g->vertices[i].tipo != CONSUMIDOR)
+
             continue;
 
+
+
         printf("\n%s", g->vertices[i].nome);
+
         printf("\nRecebido : %.2f MW", carga[i].recebido);
 
-        if (carga[i].estado == 2)
+
+
+        if(carga[i].estado == 2)
+
             printf("\nEstado   : TOTALMENTE ALIMENTADO\n");
-        else if (carga[i].estado == 1)
+
+
+        else if(carga[i].estado == 1)
+
             printf("\nEstado   : PARCIALMENTE ALIMENTADO\n");
+
+
         else
+
             printf("\nEstado   : SEM ENERGIA\n");
+
     }
+
 }
