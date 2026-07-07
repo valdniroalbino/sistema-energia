@@ -105,7 +105,7 @@ int adicionarAresta(Grafo *g, char origem[], char destino[], float capacidade)
     return 1;
 }
 
-// Remover Arestas
+// Remover aresta
 int removerAresta(Grafo *g, char origem[], char destino[])
 {
     int o = procuraVertice(g, origem);
@@ -114,20 +114,36 @@ int removerAresta(Grafo *g, char origem[], char destino[])
     if (o == -1 || d == -1)
         return 0;
 
-    for (int i = 0; i < g->n_arest; )
-{
-    if (g->arestas[i].origem == pos || g->arestas[i].destino == pos)
+    for (int i = 0; i < g->n_arest; i++)
     {
-        for (int j = i; j < g->n_arest - 1; j++)
-            g->arestas[j] = g->arestas[j + 1];
+        if ((g->arestas[i].origem == o && g->arestas[i].destino == d) ||
+            (g->arestas[i].origem == d && g->arestas[i].destino == o))
+        {
+            // Deslocar todas as arestas uma posição para trás
+            for (int j = i; j < g->n_arest - 1; j++)
+            {
+                g->arestas[j] = g->arestas[j + 1];
+            }
 
-        g->n_arest--;
+            g->n_arest--;
+
+            // Libertar memória excedente (opcional, mas recomendado)
+            if (g->n_arest > 0)
+            {
+                Aresta *tmp = realloc(g->arestas, g->n_arest * sizeof(Aresta));
+                if (tmp != NULL)
+                    g->arestas = tmp;
+            }
+            else
+            {
+                free(g->arestas);
+                g->arestas = NULL;
+            }
+
+            return 1;
+        }
     }
-    else
-    {
-        i++;
-    }
-}
+
     return 0;
 }
 
