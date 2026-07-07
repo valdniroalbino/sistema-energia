@@ -161,7 +161,7 @@ void distribuirCargaBFS(Grafo *g, char origem[])
 
     if(inicio == -1)
     {
-        printf("Central inexistente.\n");
+        printf("  [ERRO] Central inexistente.\n");
         return;
     }
 
@@ -169,7 +169,7 @@ void distribuirCargaBFS(Grafo *g, char origem[])
 
     if(g->vertices[inicio].tipo != CENTRAL)
     {
-        printf("O vertice indicado nao e uma central.\n");
+        printf("  [ERRO] O vertice indicado nao e uma central.\n");
         return;
     }
 
@@ -183,7 +183,7 @@ void distribuirCargaBFS(Grafo *g, char origem[])
 
 
 
-    printf("\n======= DISTRIBUICAO BFS =======\n");
+    printf("\n  ======= DISTRIBUICAO BFS =======\n");
 
 
 
@@ -191,8 +191,7 @@ void distribuirCargaBFS(Grafo *g, char origem[])
 
 
 
-    printf("\nEnergia restante na central: %.2f MW\n", energia);
-
+    printf("  Energia restante na central: %.2f MW\n", energia);
 }
 
 
@@ -284,7 +283,7 @@ void distribuirCargaDFS(Grafo *g, char origem[])
 
     if(inicio == -1)
     {
-        printf("Central inexistente.\n");
+        printf("  [ERRO] Central inexistente.\n");
         return;
     }
 
@@ -292,7 +291,7 @@ void distribuirCargaDFS(Grafo *g, char origem[])
 
     if(g->vertices[inicio].tipo != CENTRAL)
     {
-        printf("O vertice indicado nao e uma central.\n");
+        printf("  [ERRO] O vertice indicado nao e uma central.\n");
         return;
     }
 
@@ -310,7 +309,7 @@ void distribuirCargaDFS(Grafo *g, char origem[])
 
 
 
-    printf("\n======= DISTRIBUICAO DFS =======\n");
+    printf("\n  ======= DISTRIBUICAO DFS =======\n");
 
 
 
@@ -318,6 +317,8 @@ void distribuirCargaDFS(Grafo *g, char origem[])
 
 
 
-    printf("\nEnergia restante na central: %.2f MW\n", energia);
+    printf("  Energia restante na central: %.2f MW\n", energia);
 
 }
+
+

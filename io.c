@@ -5,6 +5,7 @@
 #include "grafo.h"
 
 #define MAX_LINE 100
+#define MAX_POT 1000
 
 int carregaRede(Grafo *g, const char *file)
 {
@@ -12,7 +13,7 @@ int carregaRede(Grafo *g, const char *file)
 
     if (fp == NULL)
     {
-        printf("Nao foi possivel abrir o ficheiro.\n");
+        printf("  [ERRO] Nao foi possivel abrir o ficheiro.\n");
         return 0;
     }
 
@@ -31,13 +32,18 @@ int carregaRede(Grafo *g, const char *file)
 
             if (sscanf(line, "CENTRAL %s %f", nome, &pot) != 2)
             {
-                printf("Erro de formato: %s", line);
+                printf("  [ERRO] Formato invalido: %s", line);
                 continue;
             }
 
             if (pot <= 0)
             {
                 printf("Erro: Potencia da central %s invalida!\n", nome);
+                continue;
+            }
+            if (pot > MAX_POT)
+            {
+                printf("  [ERRO] Potencia da central %s excede o limite!\n", nome);
                 continue;
             }
 
@@ -68,9 +74,15 @@ int carregaRede(Grafo *g, const char *file)
                 continue;
             }
 
+            if (pot > MAX_POT)
+            {
+                printf("  [ERRO] Carga da subestacao %s excede o limite!\n", nome);
+                continue;
+            }
+
             if (procuraVertice(g, nome) != -1)
             {
-                printf("Erro: Vertice %s duplicado.\n", nome);
+                printf("  [ERRO] Vertice %s duplicado.\n", nome);
                 continue;
             }
 
@@ -85,34 +97,49 @@ int carregaRede(Grafo *g, const char *file)
 
             if (sscanf(line, "LIGACAO %s %s %f", origem, destino, &capacidade) != 3)
             {
-                printf("Erro de formato: %s", line);
+                printf("  [ERRO] Formato invalido: %s", line);
                 continue;
             }
 
             if (capacidade <= 0)
             {
-                printf("Erro: Capacidade invalida!\n");
+                printf("  [ERRO] Capacidade invalida!\n");
                 continue;
             }
+            if (strcmp(origem, destino)==0)
+            {
+                printf("Erro: Ligacao %s invalida(Liga a si mesma)!\n", origem);
+                continue;
+            }
+            
 
             if (procuraVertice(g, origem) == -1)
             {
-                printf("Erro: Origem %s inexistente.\n", origem);
+                printf("  [ERRO] Origem %s inexistente.\n", origem);
                 continue;
             }
 
             if (procuraVertice(g, destino) == -1)
             {
-                printf("Erro: Destino %s inexistente.\n", destino);
+                printf("  [ERRO] Destino %s inexistente.\n", destino);
                 continue;
             }
 
 			int o = procuraVertice(g, origem);
-             int d = procuraVertice(g, destino);
+            int d = procuraVertice(g, destino);
+
+            if(g->vertices[o].tipo == 0 && capacidade > g->vertices[o].pot)
+            {
+                printf("  [ERRO] Capacidade da ligacao excede a potencia da central!\n");
+                continue;
+            }
+            {
+
+            }
 
          if (existeLigacao(g, o, d))
             {
-                printf("Erro: Ligacao duplicada %s -> %s\n", origem, destino);
+                printf("  [ERRO] Ligacao duplicada %s -> %s\n", origem, destino);
                 continue;
             }
 
@@ -122,15 +149,15 @@ int carregaRede(Grafo *g, const char *file)
     
         else
         {
-            printf("Erro: Comando invalido -> %s", line);
+            printf("  [ERRO] Comando invalido -> %s", line);
+
         }
     }
 
     fclose(fp);
 
-    printf("\nRede carregada com sucesso!\n");
-    printf("Vertices: %d\n", g->n_verti);
-    printf("Ligacoes: %d\n", g->n_arest);
+    printf("\n  [OK] Rede carregada com sucesso!\n");
+    printf("  Vertices: %d | Ligacoes: %d\n\n", g->n_verti, g->n_arest);
 
     return 1;
 }
